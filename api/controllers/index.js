@@ -1,11 +1,22 @@
 import { signInWithPassword } from "./auth.controller.js"
-import { getRolePermission } from "./role.permission.controller.js"
-import { getRoles } from "./roles.controller.js"
+import { getProductionList, addProduction, deleteProduction, updateProduction } from "./production.controller.js"
+import { getSourceList, addSource, deleteSource, updateSource } from "./source.controller.js"
+import { addUser, deleteUser, getUserList, updateUser } from "./user.controller.js"
 
 const controllers = {
   signInWithPassword,
-  getRolePermission,
-  getRoles
+  getUserList,
+  addUser,
+  updateUser,
+  deleteUser,
+  getProductionList,
+  addProduction,
+  deleteProduction,
+  updateProduction,
+  getSourceList,
+  addSource,
+  updateSource,
+  deleteSource
 }
 
 export default controllers

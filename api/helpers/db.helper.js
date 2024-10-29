@@ -37,10 +37,9 @@ db.sequelize
     })
     .then(async () => {
       const services = await import('../services/index.js')
-      // await services.default.createDefaultUserRoles()
-      // await services.default.createAdmin()
-      // await services.default.createDefaultPermissions()
-      // await services.default.createDefaultEntries()
+      await services.default.createDefaultUserRoles()
+      await services.default.createAdmin()
+      await services.default.createDefaultPermissions()
     })
     .catch((error) => {
       console.log(error)

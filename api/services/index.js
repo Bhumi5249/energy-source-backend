@@ -1,14 +1,16 @@
 import {
   findUserByEmail,
-  findUserByPhone,
   findUserById,
+  createAdmin, createDefaultPermissions, createDefaultUserRoles
 } from './user.service.js'
 import { getPermissions } from '../services/authorization.service.js'
 
 const services = {
   getPermissions,
   findUserByEmail,
-  findUserByPhone,
+  createAdmin,
+  createDefaultPermissions,
+  createDefaultUserRoles,
   findUserById,
 }
 

@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken'
 import { JWT_CONFIG, STATUS_CODE } from '../utils/constants.util.js'
-import { GeneralError, UnAuthorized } from '../utils/errors.util.js'
-import { MESSAGES } from '../utils/messages.util.js'
 
 
 export const generateTokenFunction = (secretKey, expiresIn) => (user) => {
@@ -13,13 +11,9 @@ export const generateForgotPasswordToken = generateTokenFunction(process.env.FOR
 export const generateAccessToken = generateTokenFunction(process.env.SECRET_KEY, JWT_CONFIG.ACCESS_TOKEN_EXPIRY_TIME)
 
 
-export const generateRefreshToken = (user) => {
-  return jwt.sign(user, process.env.SECRET_KEY, { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY_TIME })
-}
-
-export const verifyTokenFunction = (secretKey) => (token, next) => {
+export const verifyTokenFunction = (secretKey) => (token, res) => {
   return jwt.verify(token, secretKey, (err, user) => {
-    if (err) return next(new UnAuthorized(MESSAGES.AUTH_TOKEN_EXPIRED, STATUS_CODE.UNAUTHORIZED ))
+    if (err) return res.status(STATUS_CODE.UNAUTHORIZED).json({ message: 'Invalid token' })
     return user
   })
 }

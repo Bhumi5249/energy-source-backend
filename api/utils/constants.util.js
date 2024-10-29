@@ -18,12 +18,8 @@ export const DB_CONFIG = {
   },
   SALT_ROUND: 10,
   USER_ROLES: {
-    super_admin: 'superAdmin',
     _1: 'admin',
-    _2: 'branch',
-    _3: 'faculty',
-    _4: 'student',
-    _5: 'inquiry',
+    _2: 'manager',
   },
 }
 

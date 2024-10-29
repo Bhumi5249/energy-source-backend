@@ -3,7 +3,6 @@ import scripts from '../script/index.js'
 import helpers from '../helpers/index.js'
 import { DB_CONFIG } from '../utils/constants.util.js'
 import db from '../helpers/db.helper.js'
-import middlewares from '../middleware/index.js'
 
 export const findUserByEmail = async (email) => {
   const user = await models.Users.findOne({
@@ -13,23 +12,7 @@ export const findUserByEmail = async (email) => {
     },
     include: {
       model: models.Roles,
-      attributes: ['role_name', 'mobile_access'],
-      raw: true,
-    },
-    paranoid: false,
-  })
-  return user
-}
-
-export const findUserByPhone = async (phone) => {
-  const user = await models.Users.findOne({
-    where: {
-      phone,
-      user_status: 'active',
-    },
-    include: {
-      model: models.Roles,
-      attributes: ['role_name', 'mobile_access'],
+      attributes: ['role_name'],
       raw: true,
     },
     paranoid: false,
@@ -47,45 +30,42 @@ export const findUserById = async (userId) => {
   return user
 }
 
-export const createDefaultUserRoles = middlewares.controllerWrapper(async () => {
+export const createDefaultUserRoles = async () => {
   const t = await db.sequelize.transaction()
   const res = await models.Roles.findAll()
 
   if (!res.length) {
     await models.Roles.bulkCreate(
         [
-          { role_name: DB_CONFIG.USER_ROLES.super_admin, mobile_access: true, role_code: 5 },
           { role_name: DB_CONFIG.USER_ROLES._1, mobile_access: true, role_code: 1 },
           { role_name: DB_CONFIG.USER_ROLES._2, mobile_access: false, role_code: 2 },
-          { role_name: DB_CONFIG.USER_ROLES._3, mobile_access: true, role_code: 3 },
-          { role_name: DB_CONFIG.USER_ROLES._4, mobile_access: true, role_code: 4 },
         ],
         { transaction: t },
     )
     await t.commit()
     console.log('Roles created')
   }
-})
+}
 
 
-export const createAdmin = middlewares.controllerWrapper(async () => {
+export const createAdmin = async () => {
   const t = await db.sequelize.transaction()
   const existingAdmin = await models.Users.findOne({ where: { email: DB_CONFIG.ADMIN_CREDENTIALS.ADMIN_USER_NAME } })
-  const existingRoleAdmin = await models.Roles.findOne({ where: { role_code: 5 } })
+  const existingRoleAdmin = await models.Roles.findOne({ where: { role_code: 1 } })
 
   if (!existingAdmin) {
     const hashedPassword = await helpers.generatePasswordAndHashedOTP(DB_CONFIG.ADMIN_CREDENTIALS.ADMIN_PASSWORD)
     await models.Users.create(
-        { email: DB_CONFIG.ADMIN_CREDENTIALS.ADMIN_USER_NAME, password: hashedPassword, role_id: existingRoleAdmin.role_id },
+        { email: DB_CONFIG.ADMIN_CREDENTIALS.ADMIN_USER_NAME, password: hashedPassword, role_id: existingRoleAdmin.role_id, user_name: 'admin' },
         { transaction: t },
     )
     await t.commit()
     console.log('Admin created')
   }
-})
+}
 
 
-export const createDefaultPermissions = middlewares.controllerWrapper(async () => {
+export const createDefaultPermissions = async () => {
   const transaction = await db.sequelize.transaction()
 
   const existingPermissions = await models.Permissions.findAll({ transaction })
@@ -132,7 +112,7 @@ export const createDefaultPermissions = middlewares.controllerWrapper(async () =
 
   await transaction.commit()
   console.log('Default permissions created successfully')
-})
+}
 
 const assignRolePermissions = async (permission, roles, transaction) => {
   for (const role of roles) {
@@ -140,30 +120,13 @@ const assignRolePermissions = async (permission, roles, transaction) => {
 
     switch (role.role_code) {
       case 1: // admin
-      case 2: // branch
-        // Admin and branch roles should get all permissions except specific ones
-        if (!['VIEW_FACULTY_PROFILE', 'VIEW_STUDENT_PROFILE', 'VIEW_COURSE_DETAIL', 'VIEW_STUDENT_FEES', 'VIEW_STUDENT_EXAM', 'VIEW_FACULTY_EXAM_ASSESSMENT', 'BILLING_HISTORY', 'FACULTY_DASHBOARD', 'STUDENT_DASHBOARD'].includes(permission.permission_code)) {
+        if (['LIST_SOURCE', 'ADD_SOURCE', 'EDIT_SOURCE', 'DELETE_SOURCE', 'LIST_PRODUCTION', 'ADD_PRODUCTION', 'EDIT_PRODUCTION', 'DELETE_PRODUCTION', 'LIST_ANALYTICS', 'EXPORT_ANALYTICS', 'LIST_USER', 'ADD_USER', 'EDIT_USER', 'DELETE_USER'].includes(permission.permission_code)) {
           permissionsToAssign.push(permission.permission_id)
         }
 
         break
-      case 3: // faculty
-        // Faculty role should get specific permissions
-        if (['VIEW_FACULTY_PROFILE', 'VIEW_FACULTY_EXAM_ASSESSMENT', 'BILLING_HISTORY', 'FACULTY_DASHBOARD', 'LIST_TIMETABLE', 'FILTER_TIMETABLE', 'LIST_ATTENDANCE', 'TAKE_ATTENDANCE'].includes(permission.permission_code)) {
-          permissionsToAssign.push(permission.permission_id)
-        }
-
-        break
-      case 4: // student
-        // Student role should get specific permissions
-        if (['VIEW_STUDENT_PROFILE', 'VIEW_COURSE_DETAIL', 'VIEW_STUDENT_FEES', 'VIEW_STUDENT_EXAM', 'STUDENT_DASHBOARD'].includes(permission.permission_code)) {
-          permissionsToAssign.push(permission.permission_id)
-        }
-
-        break
-
-      case 5: // super admin
-        if (['ADMIN_DASHBOARD', 'LIST_ORG', 'ADD_ORG', 'EDIT_ORG', 'ARCHIVE_ORG', 'RESTORE_ORG', 'LIST_COMMUNICATION', 'ADD_COMMUNICATION', 'EDIT_COMMUNICATION', 'VIEW_CONFIGURATION'].includes(permission.permission_code)) {
+      case 3: // manager
+        if (['LIST_SOURCE', 'ADD_SOURCE', 'EDIT_SOURCE','LIST_PRODUCTION', 'ADD_PRODUCTION', 'EDIT_PRODUCTION'].includes(permission.permission_code)) {
           permissionsToAssign.push(permission.permission_id)
         }
 

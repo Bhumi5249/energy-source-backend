@@ -25,9 +25,11 @@ const RolePermissions = db.sequelize.define(
     },
 )
 
+RolePermissions.belongsTo(Roles, { foreignKey: 'role_id' })
+Roles.hasMany(RolePermissions, { foreignKey: 'role_id' })
+
+
 export default RolePermissions
 
 
-RolePermissions.belongsTo(Roles, { foreignKey: 'role_id' })
-Roles.hasMany(RolePermissions, { foreignKey: 'role_id' }) // Add this association
 

@@ -5,7 +5,7 @@ import controllers from '../controllers/index.js'
 const authRouter = Router()
 
 authRouter.post(
-    '/signin',
+    '/signIn',
     controllers.signInWithPassword,
 )
 
