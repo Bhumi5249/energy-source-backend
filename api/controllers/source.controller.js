@@ -7,7 +7,7 @@ export const getSourceList = async(req, res) => {
             attributes: [['sources_id', 'sourcesId'], 'name', 'type', 'capacity']
         })
 
-        res.status(STATUS_CODE.HTTP_SUCCESS).json({ data: source })
+        res.status(STATUS_CODE.HTTP_SUCCESS).send(source);
     } catch (error) {
         res.status(STATUS_CODE.SERVER_ERROR).json({ message: error.message })
     }

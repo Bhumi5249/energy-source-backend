@@ -51,7 +51,7 @@ export const permissionData = [
       'LIST_USER',
       'ADD_USER',
       'EDIT_USER',
-    'DELETE_USER'
+      'DELETE_USER'
     ],
     permission_name: [
       'List User',

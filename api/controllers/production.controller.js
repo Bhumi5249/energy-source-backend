@@ -7,7 +7,7 @@ export const getProductionList = async(req, res) => {
             attributes: [['production_id', 'productionId'],['sources_id', 'sourcesId'], 'date', 'production']
         })
 
-        res.status(STATUS_CODE.HTTP_SUCCESS).json({ data: production })
+        res.status(STATUS_CODE.HTTP_SUCCESS).send(production)
     } catch (error) {
         res.status(STATUS_CODE.SERVER_ERROR).json({ message: error.message })
     }
