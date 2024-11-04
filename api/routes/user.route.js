@@ -9,6 +9,11 @@ userRouter.get(
     controllers.getUserList
 )
 
+userRouter.get(
+    '/getRoles',
+    controllers.getRoles
+)
+
 userRouter.post(
     '/addUser',
     controllers.addUser

@@ -12,6 +12,11 @@ productionRouter.get(
     controllers.getProductionList
 )
 
+productionRouter.get(
+    '/productions/range',
+    controllers.getProductionDataByDateRange
+)
+
 productionRouter.post(
     '/addProduction',
     middlewares.authenticateJWTToken,

@@ -1,13 +1,33 @@
+import { Sequelize } from "sequelize"
 import models from "../models/index.js"
 import { STATUS_CODE } from "../utils/constants.util.js"
 
 export const getUserList = async(req, res) => {
     try {
         const user = await models.Users.findAll({
-            attributes: [['user_id', 'userId'],['user_name', 'userName'], 'email', 'password', ['role_id', 'roleId']]
+            attributes: [['user_id', 'userId'],['user_name', 'userName'], 'email', 'password', ['role_id', 'roleId'],  [Sequelize.col('Role.role_name'), 'roleName']],
+            include: [
+                {
+                    model: models.Roles,
+                    attributes: []
+                }
+            ],
+            raw: true
         })
 
-        res.status(STATUS_CODE.HTTP_SUCCESS).json({ data: user })
+        res.status(STATUS_CODE.HTTP_SUCCESS).send(user)
+    } catch (error) {
+        res.status(STATUS_CODE.SERVER_ERROR).json({ message: error.message })
+    }
+}
+
+export const getRoles = async(req, res) => {
+    try {
+        const roles = await models.Roles.findAll({
+            attributes: [['role_id', 'roleId'], ['role_name', 'roleName']],
+        })
+
+        res.status(STATUS_CODE.HTTP_SUCCESS).send(roles)
     } catch (error) {
         res.status(STATUS_CODE.SERVER_ERROR).json({ message: error.message })
     }
