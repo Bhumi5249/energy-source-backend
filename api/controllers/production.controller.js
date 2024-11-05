@@ -1,6 +1,7 @@
 import { Op, Sequelize } from "sequelize";
 import models from "../models/index.js"
 import { STATUS_CODE } from "../utils/constants.util.js"
+import { Parser } from "json2csv";
 
 export const getProductionList = async(req, res) => {
     try {
@@ -59,6 +60,48 @@ export const getProductionDataByDateRange = async (req, res) => {
         }));
 
         res.status(STATUS_CODE.HTTP_SUCCESS).json(formattedData);
+    } catch (error) {
+        res.status(STATUS_CODE.SERVER_ERROR).json({ message: error.message });
+    }
+};
+
+export const getProductionDataCSV = async (req, res) => {
+    const { startDate, endDate } = req.query;
+
+    try {
+        const productions = await models.Production.findAll({
+            where: {
+                date: {
+                    [Op.between]: [new Date(startDate), new Date(endDate)],
+                },
+            },
+            attributes: [
+                [Sequelize.fn('DATE', Sequelize.col('date')), 'date'],
+                [Sequelize.fn('SUM', Sequelize.cast(Sequelize.col('production'), 'FLOAT')), 'totalProduction'],
+                'sources_id',
+            ],
+            group: ['date', 'sources_id'],
+            include: [
+                {
+                    model: models.EnergySource,
+                    attributes: ['name'],
+                },
+            ],
+        });
+
+        const formattedData = productions.map(prod => ({
+            date: prod.date,
+            totalProduction: parseFloat(prod.dataValues.totalProduction),
+            sourceId: prod.sources_id,
+            sourceName: prod.energySource.name,
+        }));
+
+        const json2csvParser = new Parser();
+        const csvData = json2csvParser.parse(formattedData);
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment('production_data.csv');
+        res.send(csvData);
     } catch (error) {
         res.status(STATUS_CODE.SERVER_ERROR).json({ message: error.message });
     }

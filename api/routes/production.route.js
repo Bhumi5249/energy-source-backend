@@ -17,6 +17,11 @@ productionRouter.get(
     controllers.getProductionDataByDateRange
 )
 
+productionRouter.get(
+    '/productions/download',
+    controllers.getProductionDataCSV
+)
+
 productionRouter.post(
     '/addProduction',
     middlewares.authenticateJWTToken,

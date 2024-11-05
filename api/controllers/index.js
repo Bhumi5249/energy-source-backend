@@ -1,5 +1,5 @@
 import { signInWithPassword } from "./auth.controller.js"
-import { getProductionList, addProduction, deleteProduction, updateProduction, getProductionDataByDateRange } from "./production.controller.js"
+import { getProductionList, addProduction, deleteProduction, updateProduction, getProductionDataByDateRange, getProductionDataCSV } from "./production.controller.js"
 import { getSourceList, addSource, deleteSource, updateSource } from "./source.controller.js"
 import { addUser, deleteUser, getRoles, getUserList, updateUser } from "./user.controller.js"
 
@@ -18,7 +18,8 @@ const controllers = {
   updateSource,
   deleteSource,
   getProductionDataByDateRange,
-  getRoles
+  getRoles,
+  getProductionDataCSV
 }
 
 export default controllers
