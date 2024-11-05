@@ -125,8 +125,8 @@ const assignRolePermissions = async (permission, roles, transaction) => {
         }
 
         break
-      case 3: // manager
-        if (['LIST_SOURCE', 'ADD_SOURCE', 'EDIT_SOURCE','LIST_PRODUCTION', 'ADD_PRODUCTION', 'EDIT_PRODUCTION'].includes(permission.permission_code)) {
+      case 2: // manager
+        if (['LIST_SOURCE', 'ADD_SOURCE', 'EDIT_SOURCE','LIST_PRODUCTION', 'ADD_PRODUCTION', 'EDIT_PRODUCTION', 'LIST_ANALYTICS'].includes(permission.permission_code)) {
           permissionsToAssign.push(permission.permission_id)
         }
 

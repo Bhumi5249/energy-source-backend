@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize"
 import models from "../models/index.js"
 import { STATUS_CODE } from "../utils/constants.util.js"
+import helpers from "../helpers/index.js"
 
 export const getUserList = async(req, res) => {
     try {
@@ -36,10 +37,11 @@ export const getRoles = async(req, res) => {
 export const addUser = async(req, res) => {
     try {
         const { userName, email, password, roleId } = req.body
+        const hashedPassword = await helpers.generatePasswordAndHashedOTP(password)
         await models.Users.create({
             user_name: userName,
             email,
-            password,
+            password: hashedPassword,
             role_id: roleId
         })
         res.status(STATUS_CODE.HTTP_SUCCESS).json({ message: 'user created' })
